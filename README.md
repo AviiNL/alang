@@ -1,0 +1,1 @@
+[![](https://tokei.rs/b1/github/AviiNL/alang)](https://github.com/XAMPPRocky/tokei)
