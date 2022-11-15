@@ -1,5 +1,6 @@
 mod assignment;
 mod binary;
+mod conditional;
 mod grouping;
 mod program;
 mod unary;
@@ -9,6 +10,8 @@ pub use binary::Binary;
 pub use grouping::Grouping;
 pub use program::Program;
 pub use unary::Unary;
+
+pub use conditional::If;
 
 #[derive(Debug)]
 pub struct Expression {
@@ -40,4 +43,6 @@ pub enum ExpressionType {
     Binary(Binary),
     Unary(Unary),
     Grouping(Grouping),
+
+    If(If),
 }

@@ -34,6 +34,9 @@ pub use undefined_variable::UndefinedVariable;
 mod invalid_assignment;
 pub use invalid_assignment::InvalidAssignment;
 
+mod invalid_condition;
+pub use invalid_condition::InvalidCondition;
+
 pub struct Error {
     source: Box<dyn std::error::Error>,
     line: usize,

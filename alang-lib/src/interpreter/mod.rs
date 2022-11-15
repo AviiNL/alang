@@ -156,6 +156,49 @@ fn evaluate_expression(
 
             Err(InvalidOperationType::new(raw_value, None, operator.clone()).into())
         }
+        ast::ExpressionType::If(cond) => {
+            let condition = evaluate_expression(&cond.condition, env)?;
+
+            let condition = match &condition.value {
+                RuntimeValue::Boolean(value) => value,
+                _ => {
+                    return Err(InvalidCondition::new(
+                        condition,
+                        expression.line,
+                        expression.column,
+                    )
+                    .into())
+                }
+            };
+
+            if condition.value {
+                let mut last_value = RuntimeValue::Null;
+                for expression in &cond.body {
+                    last_value = evaluate_expression(expression, env)?.value;
+                }
+                return Ok(RuntimeType {
+                    value: last_value,
+                    line: expression.line,
+                    column: expression.column,
+                });
+            } else if let Some(else_body) = &cond.else_body {
+                let mut last_value = RuntimeValue::Null;
+                for expression in else_body {
+                    last_value = evaluate_expression(expression, env)?.value;
+                }
+                return Ok(RuntimeType {
+                    value: last_value,
+                    line: expression.line,
+                    column: expression.column,
+                });
+            }
+
+            Ok(RuntimeType {
+                value: RuntimeValue::Null,
+                line: expression.line,
+                column: expression.column,
+            })
+        }
         ast::ExpressionType::Grouping(group) => {
             let value = evaluate_expression(&group.expression, env)?;
 

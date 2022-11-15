@@ -7,6 +7,12 @@ pub enum TokenType {
     Number(f64),
     Boolean(bool),
 
+    // Keywords
+    If,
+    Else,
+    EndIf,
+    Return,
+
     // Arithmatic Operators
     Plus,
     Minus,

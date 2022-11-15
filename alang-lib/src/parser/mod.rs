@@ -24,13 +24,31 @@ impl Parser {
         let tokens = tokenize(input)?;
         let mut parser = Parser { tokens };
 
-        let mut body = Vec::new();
-
-        while !parser.is_eof() {
-            body.push(parser.parse()?);
-        }
+        let body = parser.parse_block(None)?;
 
         Ok(ast::Program { body })
+    }
+
+    fn is_end_token(&self, tokens: Option<&[TokenType]>) -> bool {
+        if let Some(tokens) = tokens {
+            tokens.contains(&self.peek().token_type)
+        } else {
+            false
+        }
+    }
+
+    fn parse_block(
+        &mut self,
+        end_token: Option<&[TokenType]>,
+    ) -> Result<Vec<ast::Expression>, Error> {
+        let mut body = Vec::new();
+
+        while !self.is_eof() && !self.is_end_token(end_token) {
+            let expr = self.parse()?;
+            body.push(expr);
+        }
+
+        Ok(body)
     }
 
     fn parse(&mut self) -> Result<ast::Expression, Error> {
@@ -330,6 +348,40 @@ impl Parser {
                 Ok(ast::Expression::new(
                     ExpressionType::Grouping(ast::Grouping {
                         expression: Box::new(expr),
+                    }),
+                    line,
+                    column,
+                ))
+            }
+            TokenType::If => {
+                let condition = self.parse_expression()?;
+
+                self.expect(TokenType::EOL)?;
+
+                let then_branch = self.parse_block(Some(&[TokenType::Else, TokenType::EndIf]))?;
+
+                let else_branch = if self.peek().token_type == TokenType::Else {
+                    self.eat()?; // Eat the else
+                    self.expect(TokenType::EOL)?; // Eat the EOL
+
+                    let else_branch = self.parse_block(Some(&[TokenType::EndIf]))?;
+
+                    Some(else_branch)
+                } else {
+                    None
+                };
+
+                self.expect(TokenType::EndIf)?;
+                self.expect(TokenType::EOL)?;
+
+                let line = condition.line;
+                let column = condition.column;
+
+                Ok(ast::Expression::new(
+                    ExpressionType::If(ast::If {
+                        condition: Box::new(condition),
+                        body: then_branch,
+                        else_body: else_branch,
                     }),
                     line,
                     column,

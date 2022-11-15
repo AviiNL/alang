@@ -1,4 +1,4 @@
-use super::{BinaryOperation, BinaryOperationError, Operator, Relational, RuntimeValue};
+use super::{BinaryOperation, BinaryOperationError, Logical, Operator, Relational, RuntimeValue};
 use crate::token::{Token, TokenType};
 
 use std::fmt::{Debug, Display};
@@ -39,6 +39,12 @@ impl BinaryOperation for BooleanVal {
             })),
             Operator::Relational(Relational::NotEqual) => Ok(RuntimeValue::Boolean(BooleanVal {
                 value: self.value != other,
+            })),
+            Operator::Logical(Logical::And) => Ok(RuntimeValue::Boolean(BooleanVal {
+                value: self.value && other,
+            })),
+            Operator::Logical(Logical::Or) => Ok(RuntimeValue::Boolean(BooleanVal {
+                value: self.value || other,
             })),
             _ => Err(BinaryOperationError::InvalidOperator),
         }

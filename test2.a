@@ -1,0 +1,10 @@
+something = 123
+rawr = true
+
+result = if something == 123 && rawr == false
+    123
+else
+    456
+endif
+
+result + 10

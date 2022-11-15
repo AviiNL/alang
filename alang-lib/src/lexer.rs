@@ -8,6 +8,10 @@ use crate::{
 static KEYWORDS: &[(&str, TokenType)] = &[
     ("true", TokenType::Boolean(true)),
     ("false", TokenType::Boolean(false)),
+    ("if", TokenType::If),
+    ("else", TokenType::Else),
+    ("endif", TokenType::EndIf),
+    ("return", TokenType::Return),
 ];
 
 pub fn tokenize(input: &str) -> Result<VecDeque<Token>, Error> {
