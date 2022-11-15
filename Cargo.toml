@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "alang-lib",
+    "alang-main"
+]
