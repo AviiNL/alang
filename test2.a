@@ -8,6 +8,6 @@ else
     456
 endif
 
-result += 10
+result + 10
 
 return result
