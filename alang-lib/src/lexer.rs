@@ -166,7 +166,40 @@ pub fn tokenize(input: &str) -> Result<VecDeque<Token>, Error> {
             '+' => tokens.push_back(Token::new(TokenType::Plus, line, column)),
             '-' => tokens.push_back(Token::new(TokenType::Minus, line, column)),
             '*' => tokens.push_back(Token::new(TokenType::Star, line, column)),
-            '/' => tokens.push_back(Token::new(TokenType::Slash, line, column)),
+            '/' => {
+                // Comments
+                if let Some(&'/') = chars.peek() {
+                    chars.next();
+                    column += 1;
+                    while let Some(&c) = chars.peek() {
+                        if c == '\n' {
+                            break;
+                        }
+                        chars.next();
+                        column += 1;
+                    }
+                    continue;
+                } else if let Some(&'*') = chars.peek() {
+                    chars.next();
+                    column += 1;
+                    while let Some(&c) = chars.peek() {
+                        if c == '*' {
+                            chars.next();
+                            column += 1;
+                            if let Some(&'/') = chars.peek() {
+                                chars.next();
+                                column += 1;
+                                break;
+                            }
+                        } else {
+                            chars.next();
+                            column += 1;
+                        }
+                    }
+                    continue;
+                }
+                tokens.push_back(Token::new(TokenType::Slash, line, column))
+            }
             '%' => tokens.push_back(Token::new(TokenType::Percent, line, column)),
             '^' => tokens.push_back(Token::new(TokenType::Caret, line, column)),
 
