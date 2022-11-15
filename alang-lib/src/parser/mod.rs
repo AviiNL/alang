@@ -387,6 +387,24 @@ impl Parser {
                     column,
                 ))
             }
+            TokenType::Return => {
+                let value = self.parse_expression()?;
+
+                if self.tokens.len() > 1 {
+                    self.expect(TokenType::EOL)?;
+                }
+
+                let line = value.line;
+                let column = value.column;
+
+                Ok(ast::Expression::new(
+                    ExpressionType::Return(ast::Return {
+                        value: Box::new(value),
+                    }),
+                    line,
+                    column,
+                ))
+            }
             token_type => {
                 Err(UnexpectedToken::new(token_type, None, token.line, token.column).into())
             }

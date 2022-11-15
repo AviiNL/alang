@@ -12,13 +12,15 @@ use crate::{
 pub use environment::Environment;
 
 pub fn run(ast: &ast::Program, env: &mut Environment) -> Result<RuntimeValue, Error> {
-    let mut last_value = RuntimeValue::Null;
-
     for expression in &ast.body {
-        last_value = evaluate_expression(expression, env)?.value;
+        let value = evaluate_expression(expression, env)?.value;
+        if let RuntimeValue::Return(value) = value {
+            let v = *value;
+            return Ok(v.value);
+        }
     }
 
-    Ok(last_value)
+    Ok(RuntimeValue::Null)
 }
 
 fn evaluate_expression(
@@ -175,6 +177,10 @@ fn evaluate_expression(
                 let mut last_value = RuntimeValue::Null;
                 for expression in &cond.body {
                     last_value = evaluate_expression(expression, env)?.value;
+                    if let RuntimeValue::Return(value) = last_value {
+                        let v = *value;
+                        return Ok(v);
+                    }
                 }
                 return Ok(RuntimeType {
                     value: last_value,
@@ -185,6 +191,10 @@ fn evaluate_expression(
                 let mut last_value = RuntimeValue::Null;
                 for expression in else_body {
                     last_value = evaluate_expression(expression, env)?.value;
+                    if let RuntimeValue::Return(value) = last_value {
+                        let v = *value;
+                        return Ok(v);
+                    }
                 }
                 return Ok(RuntimeType {
                     value: last_value,
@@ -195,6 +205,14 @@ fn evaluate_expression(
 
             Ok(RuntimeType {
                 value: RuntimeValue::Null,
+                line: expression.line,
+                column: expression.column,
+            })
+        }
+        ast::ExpressionType::Return(value) => {
+            let value = evaluate_expression(&*value.value, env)?;
+            Ok(RuntimeType {
+                value: RuntimeValue::Return(Box::new(value)),
                 line: expression.line,
                 column: expression.column,
             })

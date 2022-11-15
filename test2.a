@@ -1,10 +1,13 @@
 something = 123
 rawr = true
 
-result = if something == 123 && rawr == false
+result = \
+if something == 123 && rawr
     123
 else
     456
 endif
 
-result + 10
+result += 10
+
+return result

@@ -6,3 +6,8 @@ pub struct If {
     pub body: Vec<Expression>,
     pub else_body: Option<Vec<Expression>>,
 }
+
+#[derive(Debug)]
+pub struct Return {
+    pub value: Box<Expression>,
+}

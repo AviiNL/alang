@@ -11,7 +11,7 @@ pub use grouping::Grouping;
 pub use program::Program;
 pub use unary::Unary;
 
-pub use conditional::If;
+pub use conditional::{If, Return};
 
 #[derive(Debug)]
 pub struct Expression {
@@ -45,4 +45,5 @@ pub enum ExpressionType {
     Grouping(Grouping),
 
     If(If),
+    Return(Return),
 }
