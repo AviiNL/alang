@@ -44,10 +44,13 @@ impl std::error::Error for UnexpectedToken {}
 
 impl Into<crate::errors::Error> for UnexpectedToken {
     fn into(self) -> crate::errors::Error {
-        let message = if self.expected.is_some() {
+        let expected = &self.expected;
+
+        let message = if expected.is_some() {
+            let expected = expected.clone().unwrap();
             format!(
                 "Unexpected Token {:?} expected {:?}",
-                self.provided, self.expected
+                self.provided, expected
             )
             .to_string()
         } else {

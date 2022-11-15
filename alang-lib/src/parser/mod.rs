@@ -34,7 +34,13 @@ impl Parser {
     }
 
     fn parse(&mut self) -> Result<ast::Expression, Error> {
-        self.parse_expression()
+        let expr = self.parse_expression();
+
+        while self.peek().token_type == TokenType::EOL {
+            self.eat()?;
+        }
+
+        expr
     }
 
     fn parse_expression(&mut self) -> Result<ast::Expression, Error> {

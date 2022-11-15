@@ -1,5 +1,7 @@
-1 + 2 * 5 ^ 2 % 3 - 4 / 6 + 1 // this is a comment
+rawr = 1 + 2 * 5 ^ 2 % 3 - 4 / 6 + 1 \
+    + 5 / 2
 
-/*
-    this is also a comment
-*/
+
+-(rawr - 10)
+
+

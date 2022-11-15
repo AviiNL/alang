@@ -13,6 +13,9 @@ pub use unhandled_character::UnhandledCharacter;
 mod invalid_escape_character;
 pub use invalid_escape_character::InvalidEscapeCharacter;
 
+mod unexpected_eol;
+pub use unexpected_eol::UnexpectedEOL;
+
 mod unexpected_eof;
 pub use unexpected_eof::UnexpectedEOF;
 

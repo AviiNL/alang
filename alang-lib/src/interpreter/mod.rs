@@ -5,7 +5,8 @@ use crate::{
     parser::ast,
     types::{
         boolean::BooleanVal, character::CharacterVal, number::NumberVal, string::StringVal,
-        BinaryOperation, BinaryOperationError, RuntimeType, RuntimeValue,
+        Arithmatic, BinaryOperation, BinaryOperationError, Logical, Operator, RuntimeType,
+        RuntimeValue,
     },
 };
 pub use environment::Environment;
@@ -88,7 +89,7 @@ fn evaluate_expression(
                         Err(InvalidOperation::new(left, right, operator.clone()).into())
                     }
                     BinaryOperationError::InvalidOperationType => {
-                        Err(InvalidOperationType::new(left, right, operator.clone()).into())
+                        Err(InvalidOperationType::new(left, Some(right), operator.clone()).into())
                     }
                     BinaryOperationError::InvalidOperator => Err(InvalidOperator::new(
                         operator.clone(),
@@ -99,7 +100,70 @@ fn evaluate_expression(
                 },
             }
         }
-        ast::ExpressionType::Unary(_) => todo!(),
-        ast::ExpressionType::Grouping(_) => todo!(),
+        ast::ExpressionType::Unary(unary) => {
+            let raw_value = evaluate_expression(&unary.right, env)?;
+            let operator = &unary.operator;
+
+            // ensure value is a number
+            let value = match &raw_value.value {
+                RuntimeValue::Number(value) => Some(value),
+                _ => None,
+            };
+
+            if value.is_some() {
+                let value = value.unwrap();
+                return match operator {
+                    Operator::Arithmatic(Arithmatic::Minus) => Ok(RuntimeType {
+                        value: RuntimeValue::Number((-value.value).into()),
+                        line: expression.line,
+                        column: expression.column,
+                    }),
+                    Operator::Arithmatic(Arithmatic::Plus) => Ok(RuntimeType {
+                        value: RuntimeValue::Number((value.value).into()),
+                        line: expression.line,
+                        column: expression.column,
+                    }),
+                    _ => Err(InvalidOperator::new(
+                        operator.clone(),
+                        expression.line,
+                        expression.column,
+                    )
+                    .into()),
+                };
+            }
+
+            let value = match &raw_value.value {
+                RuntimeValue::Boolean(value) => Some(value),
+                _ => None,
+            };
+
+            if value.is_some() {
+                let value = value.unwrap();
+                return match operator {
+                    Operator::Logical(Logical::Not) => Ok(RuntimeType {
+                        value: RuntimeValue::Boolean((!value.value).into()),
+                        line: expression.line,
+                        column: expression.column,
+                    }),
+                    _ => Err(InvalidOperator::new(
+                        operator.clone(),
+                        expression.line,
+                        expression.column,
+                    )
+                    .into()),
+                };
+            }
+
+            Err(InvalidOperationType::new(raw_value, None, operator.clone()).into())
+        }
+        ast::ExpressionType::Grouping(group) => {
+            let value = evaluate_expression(&group.expression, env)?;
+
+            Ok(RuntimeType {
+                value: value.value,
+                line: expression.line,
+                column: expression.column,
+            })
+        }
     }
 }

@@ -25,6 +25,22 @@ pub fn tokenize(input: &str) -> Result<VecDeque<Token>, Error> {
             '\n' => {
                 line += 1;
                 column = 0;
+
+                // if the last added token is a backslash, remove it and continue
+                if let Some(Token {
+                    token_type: TokenType::Backslash,
+                    ..
+                }) = tokens.back()
+                {
+                    tokens.pop_back();
+                    continue;
+                }
+
+                if group > 0 {
+                    return Err(UnexpectedEOL::new(line, column).into());
+                }
+
+                tokens.push_back(Token::new(TokenType::EOL, line, column));
             }
 
             // Identifier
@@ -290,6 +306,7 @@ pub fn tokenize(input: &str) -> Result<VecDeque<Token>, Error> {
             '}' => tokens.push_back(Token::new(TokenType::RightBrace, line, column)),
             '[' => tokens.push_back(Token::new(TokenType::LeftBracket, line, column)),
             ']' => tokens.push_back(Token::new(TokenType::RightBracket, line, column)),
+            '\\' => tokens.push_back(Token::new(TokenType::Backslash, line, column)),
 
             // Whitespace and unhandled characters
             _ => {

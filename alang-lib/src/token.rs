@@ -39,6 +39,7 @@ pub enum TokenType {
     Equal,
 
     // Delimiters
+    Backslash,
     Comma,
     Semicolon,
     Colon,
@@ -49,6 +50,9 @@ pub enum TokenType {
     RightBrace,
     LeftBracket,
     RightBracket,
+
+    // End of Line
+    EOL,
 
     // End of File
     EOF,
