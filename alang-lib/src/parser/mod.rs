@@ -201,6 +201,8 @@ impl Parser {
 
         while self.peek().token_type == TokenType::EqualEqual
             || self.peek().token_type == TokenType::BangEqual
+            || self.peek().token_type == TokenType::Is
+        // Type check
         {
             let operator = self.eat()?.into();
             let right = self.parse_comparison()?;
@@ -335,7 +337,10 @@ impl Parser {
 
     // !   ~   -   +   *   &   sizeof   type cast   ++   --
     fn parse_unary(&mut self) -> Result<ast::Expression, Error> {
-        if self.peek().token_type == TokenType::Bang || self.peek().token_type == TokenType::Minus {
+        if self.peek().token_type == TokenType::Bang
+            || self.peek().token_type == TokenType::Minus
+            || self.peek().token_type == TokenType::Plus
+        {
             let operator = self.eat()?.into();
             let right = self.parse_unary()?;
 
@@ -424,6 +429,11 @@ impl Parser {
             )),
             TokenType::Identifier(value) => Ok(ast::Expression::new(
                 ExpressionType::Identifier(value),
+                token.line,
+                token.column,
+            )),
+            TokenType::Function => Ok(ast::Expression::new(
+                ExpressionType::Type("function".to_string()),
                 token.line,
                 token.column,
             )),

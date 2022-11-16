@@ -1,12 +1,19 @@
 function test(a, b)
-    function test2(c, d)
-        return a + b + c + d
+    if a + b == 3
+        function test2(c, d)
+            return a + b + c + d
+        end
+        return test2
+    else
+        return a + b
     end
-
-    return test2
 end
 
 result1 = test(1, 2)
-result2 = result1(3, 4)
+result2 = if result1 is function // is = type check (at least for functions)
+    return result1(3, 4)
+else
+    return result1
+end
 
 return result2

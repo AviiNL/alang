@@ -13,6 +13,7 @@ pub enum TokenType {
     End,
     Function,
     Return,
+    Is,
 
     // Arithmatic Operators
     Plus,

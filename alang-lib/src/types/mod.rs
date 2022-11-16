@@ -17,6 +17,7 @@ pub struct RuntimeType {
 
 #[derive(Debug, Clone)]
 pub enum RuntimeValue {
+    Type(String),
     String(string::StringVal),
     Number(number::NumberVal),
     Boolean(boolean::BooleanVal),
@@ -34,16 +35,35 @@ impl BinaryOperation for RuntimeValue {
         other: &RuntimeValue,
         operator: Operator,
     ) -> Result<RuntimeValue, BinaryOperationError> {
-        match self {
-            RuntimeValue::String(value) => value.operation(other, operator),
-            RuntimeValue::Number(value) => value.operation(other, operator),
-            RuntimeValue::Boolean(value) => value.operation(other, operator),
-            RuntimeValue::Character(value) => value.operation(other, operator),
-            // RuntimeValue::Array(value) => value.operation(other, operator),
-            // RuntimeValue::Object(value) => value.operation(other, operator),
-            // RuntimeValue::Function(value) => value.operation(other, operator),
-            // RuntimeValue::Null => Err(BinaryOperationError::Null),
-            _ => Err(BinaryOperationError::InvalidOperation),
+        match operator {
+            Operator::Relational(Relational::Is) => {
+                let other = match other {
+                    RuntimeValue::Type(other) => other,
+                    _ => return Err(BinaryOperationError::InvalidOperationType),
+                };
+
+                match self {
+                    RuntimeValue::Function(_) => {
+                        return Ok(RuntimeValue::Boolean(boolean::BooleanVal {
+                            value: other == "function",
+                        }))
+                    }
+                    _ => return Ok(RuntimeValue::Boolean(boolean::BooleanVal { value: false })),
+                };
+            }
+            _ => {
+                match self {
+                    RuntimeValue::String(value) => value.operation(other, operator),
+                    RuntimeValue::Number(value) => value.operation(other, operator),
+                    RuntimeValue::Boolean(value) => value.operation(other, operator),
+                    RuntimeValue::Character(value) => value.operation(other, operator),
+                    // RuntimeValue::Array(value) => value.operation(other, operator),
+                    // RuntimeValue::Object(value) => value.operation(other, operator),
+                    // RuntimeValue::Function(value) => value.operation(other, operator),
+                    // RuntimeValue::Null => Err(BinaryOperationError::Null),
+                    _ => Err(BinaryOperationError::InvalidOperation),
+                }
+            }
         }
     }
 }
@@ -51,6 +71,7 @@ impl BinaryOperation for RuntimeValue {
 impl std::fmt::Display for RuntimeType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match &self.value {
+            RuntimeValue::Type(value) => write!(f, "Type: {}", value),
             RuntimeValue::String(val) => val.fmt(f),
             RuntimeValue::Number(val) => val.fmt(f),
             RuntimeValue::Boolean(val) => val.fmt(f),
@@ -107,6 +128,8 @@ pub enum Relational {
 
     LessThanOrEqual,    // <=
     GreaterThanOrEqual, // >=
+
+    Is, // is
 }
 
 #[derive(Debug, Clone)]
@@ -135,6 +158,8 @@ impl std::fmt::Display for Operator {
             Operator::Relational(Relational::LessThanOrEqual) => write!(f, "<="),
             Operator::Relational(Relational::GreaterThanOrEqual) => write!(f, ">="),
 
+            Operator::Relational(Relational::Is) => write!(f, "is"),
+
             Operator::Logical(Logical::And) => write!(f, "&&"),
             Operator::Logical(Logical::Or) => write!(f, "||"),
             Operator::Logical(Logical::Not) => write!(f, "!"),
@@ -157,6 +182,7 @@ impl From<Token> for Operator {
             TokenType::Greater => Operator::Relational(Relational::GreaterThan),
             TokenType::LessEqual => Operator::Relational(Relational::LessThanOrEqual),
             TokenType::GreaterEqual => Operator::Relational(Relational::GreaterThanOrEqual),
+            TokenType::Is => Operator::Relational(Relational::Is),
             TokenType::And => Operator::Logical(Logical::And),
             TokenType::Or => Operator::Logical(Logical::Or),
             TokenType::Bang => Operator::Logical(Logical::Not),

@@ -39,6 +39,7 @@ pub enum ExpressionType {
     String(String),
     Character(char),
     Boolean(bool),
+    Type(String),
 
     Assignment(Assignment),
     Binary(Binary),

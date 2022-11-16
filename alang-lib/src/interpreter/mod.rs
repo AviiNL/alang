@@ -159,6 +159,12 @@ fn evaluate_expression(
             Err(InvalidOperationType::new(raw_value, None, operator.clone()).into())
         }
 
+        ast::ExpressionType::Type(t) => Ok(RuntimeType {
+            value: RuntimeValue::Type(t.to_owned()),
+            line: expression.line,
+            column: expression.column,
+        }),
+
         ast::ExpressionType::If(cond) => {
             let condition = evaluate_expression(&cond.condition, env)?;
 
