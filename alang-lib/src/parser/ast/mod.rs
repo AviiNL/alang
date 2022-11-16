@@ -3,6 +3,7 @@ mod binary;
 mod conditional;
 mod function;
 mod grouping;
+mod include;
 mod program;
 mod unary;
 
@@ -11,6 +12,7 @@ pub use binary::Binary;
 pub use conditional::{If, Return};
 pub use function::{Call, Function};
 pub use grouping::Grouping;
+pub use include::Include;
 pub use program::Program;
 pub use unary::Unary;
 
@@ -50,4 +52,6 @@ pub enum ExpressionType {
     Function(Function),
     Return(Return),
     Call(Call),
+
+    Include(Include),
 }

@@ -1,9 +1,5 @@
-test = 12
-
-if test == 1 then
-else if test == 2 then
-else
-    test = 42
+function add(a, b)
+    return a + b
 end
 
-return test
+return "Hello World!"

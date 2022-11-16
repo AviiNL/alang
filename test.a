@@ -1,0 +1,7 @@
+function some_other_env()
+    hello = include("test2.a")
+
+    return add(1, 2)
+end
+
+return some_other_env()

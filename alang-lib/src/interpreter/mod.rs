@@ -1,8 +1,10 @@
 pub mod environment;
 
+use std::io::Read;
+
 use crate::{
     errors::*,
-    parser::ast,
+    parser::{ast, Parser},
     types::{
         boolean::BooleanVal, character::CharacterVal, function::FunctionVal, number::NumberVal,
         string::StringVal, Arithmatic, BinaryOperation, BinaryOperationError, Logical, Operator,
@@ -310,6 +312,41 @@ fn evaluate_expression(
 
             Ok(RuntimeType {
                 value: last_value,
+                line: expression.line,
+                column: expression.column,
+            })
+        }
+        ast::ExpressionType::Include(inc) => {
+            let path_expr = &*inc.path;
+            let raw_path = evaluate_expression(path_expr, env)?;
+
+            let path = match &raw_path.value {
+                RuntimeValue::String(path) => path,
+                _ => {
+                    return Err(InvalidIncludePath::new(
+                        raw_path,
+                        expression.line,
+                        expression.column,
+                    )
+                    .into())
+                }
+            };
+
+            let path = path.value.clone();
+
+            let mut file = std::fs::File::open(path.clone())
+                .map_err(|e| IOError::new(e, path_expr.line, path_expr.column).into())?;
+
+            let mut source_code = String::new();
+            file.read_to_string(&mut source_code)
+                .map_err(|e| IOError::new(e, path_expr.line, path_expr.column).into())?;
+
+            let ast = Parser::produce_ast(&source_code)?;
+
+            let result = run(&ast, env)?;
+
+            Ok(RuntimeType {
+                value: result,
                 line: expression.line,
                 column: expression.column,
             })

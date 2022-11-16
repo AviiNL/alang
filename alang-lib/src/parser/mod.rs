@@ -13,7 +13,7 @@ use crate::{
     token::{Token, TokenType},
 };
 
-use self::ast::ExpressionType;
+use self::ast::{ExpressionType, Include};
 
 pub struct Parser {
     tokens: VecDeque<Token>,
@@ -437,6 +437,19 @@ impl Parser {
                 token.line,
                 token.column,
             )),
+            TokenType::Include => {
+                self.expect(TokenType::LeftParen)?;
+                let path = self.parse_expression()?;
+                self.expect(TokenType::RightParen)?;
+
+                Ok(ast::Expression::new(
+                    ExpressionType::Include(Include {
+                        path: Box::new(path),
+                    }),
+                    token.line,
+                    token.column,
+                ))
+            }
             TokenType::LeftParen => {
                 let expr = self.parse_expression()?;
                 self.expect(TokenType::RightParen)?;

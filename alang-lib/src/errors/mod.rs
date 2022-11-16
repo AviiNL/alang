@@ -16,6 +16,9 @@ pub use invalid_escape_character::InvalidEscapeCharacter;
 mod invalid_function_name;
 pub use invalid_function_name::InvalidFunctionName;
 
+mod invalid_include_path;
+pub use invalid_include_path::InvalidIncludePath;
+
 mod invalid_argument_count;
 pub use invalid_argument_count::InvalidArgumentCount;
 
@@ -48,6 +51,9 @@ pub use invalid_assignment::InvalidAssignment;
 
 mod invalid_condition;
 pub use invalid_condition::InvalidCondition;
+
+mod io_error;
+pub use io_error::IOError;
 
 pub struct Error {
     source: Box<dyn std::error::Error>,

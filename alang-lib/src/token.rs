@@ -15,6 +15,7 @@ pub enum TokenType {
     Function,
     Return,
     Is,
+    Include,
 
     // Arithmatic Operators
     Plus,
