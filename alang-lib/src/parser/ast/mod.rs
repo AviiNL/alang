@@ -1,19 +1,20 @@
 mod assignment;
 mod binary;
 mod conditional;
+mod function;
 mod grouping;
 mod program;
 mod unary;
 
 pub use assignment::Assignment;
 pub use binary::Binary;
+pub use conditional::{If, Return};
+pub use function::{Call, Function};
 pub use grouping::Grouping;
 pub use program::Program;
 pub use unary::Unary;
 
-pub use conditional::{If, Return};
-
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Expression {
     pub expression_type: ExpressionType,
     pub line: usize,
@@ -30,7 +31,7 @@ impl Expression {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ExpressionType {
     // Literals
     Identifier(String),
@@ -45,5 +46,7 @@ pub enum ExpressionType {
     Grouping(Grouping),
 
     If(If),
+    Function(Function),
     Return(Return),
+    Call(Call),
 }

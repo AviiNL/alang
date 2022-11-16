@@ -2,11 +2,11 @@ use crate::token::{Token, TokenType};
 
 pub mod boolean;
 pub mod character;
+pub mod function;
 pub mod number;
 pub mod string;
 // mod array;
 // mod object;
-// mod function;
 
 #[derive(Debug, Clone)]
 pub struct RuntimeType {
@@ -21,10 +21,10 @@ pub enum RuntimeValue {
     Number(number::NumberVal),
     Boolean(boolean::BooleanVal),
     Character(character::CharacterVal),
+    Function(function::FunctionVal),
     Return(Box<RuntimeType>),
     // Array(array::ArrayVal),
     // Object(object::ObjectVal),
-    // Function(function::FunctionVal),
     Null,
 }
 
@@ -56,9 +56,10 @@ impl std::fmt::Display for RuntimeType {
             RuntimeValue::Boolean(val) => val.fmt(f),
             RuntimeValue::Character(val) => val.fmt(f),
             RuntimeValue::Return(val) => val.fmt(f),
+            RuntimeValue::Function(val) => val.fmt(f),
+
             // RuntimeValue::Array(val) => val.fmt(f),
             // RuntimeValue::Object(val) => val.fmt(f),
-            // RuntimeValue::Function(val) => val.fmt(f),
             RuntimeValue::Null => write!(f, "null"),
         }
     }

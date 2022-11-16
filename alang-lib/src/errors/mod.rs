@@ -13,6 +13,12 @@ pub use unhandled_character::UnhandledCharacter;
 mod invalid_escape_character;
 pub use invalid_escape_character::InvalidEscapeCharacter;
 
+mod invalid_function_name;
+pub use invalid_function_name::InvalidFunctionName;
+
+mod invalid_argument_count;
+pub use invalid_argument_count::InvalidArgumentCount;
+
 mod unexpected_eol;
 pub use unexpected_eol::UnexpectedEOL;
 
@@ -25,11 +31,17 @@ pub use invalid_character_literal::InvalidCharacterLiteral;
 mod unexpected_token;
 pub use unexpected_token::UnexpectedToken;
 
+mod unexpected_expression;
+pub use unexpected_expression::UnexpectedExpression;
+
 mod unhandled_token;
 pub use unhandled_token::UnhandledToken;
 
 mod undefined_variable;
 pub use undefined_variable::UndefinedVariable;
+
+mod undefined_function;
+pub use undefined_function::UndefinedFunction;
 
 mod invalid_assignment;
 pub use invalid_assignment::InvalidAssignment;

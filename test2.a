@@ -1,13 +1,12 @@
-something = 123
-rawr = true
+function test(a, b)
+    function test2(c, d)
+        return a + b + c + d
+    end
 
-result = \
-if something == 123 && rawr
-    123
-else
-    456
-endif
+    return test2
+end
 
-result + 10
+result1 = test(1, 2)
+result2 = result1(3, 4)
 
-return result
+return result2

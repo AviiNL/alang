@@ -10,7 +10,8 @@ static KEYWORDS: &[(&str, TokenType)] = &[
     ("false", TokenType::Boolean(false)),
     ("if", TokenType::If),
     ("else", TokenType::Else),
-    ("endif", TokenType::EndIf),
+    ("function", TokenType::Function),
+    ("end", TokenType::End),
     ("return", TokenType::Return),
 ];
 

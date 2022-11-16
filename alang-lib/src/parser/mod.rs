@@ -68,11 +68,11 @@ impl Parser {
     // Assignment operators (right to left)
     // Todo: +=   -=   *=   /=   %=   &=   |=   ^=   <<=   >>=
     fn parse_assignment(&mut self) -> Result<ast::Expression, Error> {
-        let mut left = self.parse_or()?;
+        let mut left = self.parse_function()?;
 
         while self.peek().token_type == TokenType::Equal {
             self.eat()?;
-            let right = self.parse_or()?;
+            let right = self.parse_function()?;
 
             let line = left.line;
             let column = left.column;
@@ -88,6 +88,53 @@ impl Parser {
         }
 
         Ok(left)
+    }
+
+    // Function declaration
+    fn parse_function(&mut self) -> Result<ast::Expression, Error> {
+        if self.peek().token_type != TokenType::Function {
+            return self.parse_or();
+        }
+
+        self.expect(TokenType::Function)?;
+
+        let name = self.parse_identifier()?;
+
+        self.expect(TokenType::LeftParen)?;
+
+        let mut parameters = Vec::new();
+
+        while self.peek().token_type != TokenType::RightParen {
+            let parameter = self.parse_identifier()?;
+
+            parameters.push(parameter);
+
+            if self.peek().token_type == TokenType::Comma {
+                self.eat()?;
+            }
+        }
+
+        self.expect(TokenType::RightParen)?;
+
+        self.expect(TokenType::EOL)?;
+
+        let body = self.parse_block(Some(&[TokenType::End]))?;
+
+        self.expect(TokenType::End)?;
+        self.expect(TokenType::EOL)?;
+
+        let line = name.line;
+        let column = name.column;
+
+        Ok(ast::Expression::new(
+            ExpressionType::Function(ast::Function {
+                name: Box::new(name),
+                parameters,
+                body,
+            }),
+            line,
+            column,
+        ))
     }
 
     // Conditional expression (ternary)
@@ -304,8 +351,50 @@ impl Parser {
                 column,
             ))
         } else {
-            self.parse_primary()
+            self.parse_function_call()
         }
+    }
+
+    // Function call
+    fn parse_function_call(&mut self) -> Result<ast::Expression, Error> {
+        let mut left = self.parse_primary()?;
+
+        if self.peek().token_type == TokenType::LeftParen {
+            let parameters = self.parse_arguments()?;
+
+            let line = left.line;
+            let column = left.column;
+
+            left = ast::Expression::new(
+                ast::ExpressionType::Call(ast::Call {
+                    name: Box::new(left),
+                    parameters,
+                }),
+                line,
+                column,
+            );
+        }
+
+        Ok(left)
+    }
+
+    // Function Arguments
+    fn parse_arguments(&mut self) -> Result<Vec<ast::Expression>, Error> {
+        let mut arguments = Vec::new();
+
+        self.expect(TokenType::LeftParen)?; // Eat the left parenthesis
+
+        while self.peek().token_type != TokenType::RightParen {
+            arguments.push(self.parse_expression()?);
+
+            if self.peek().token_type == TokenType::Comma {
+                self.eat()?;
+            }
+        }
+
+        self.expect(TokenType::RightParen)?; // Eat the right parenthesis
+
+        Ok(arguments)
     }
 
     // function call, scope, array/member access, etc
@@ -358,20 +447,20 @@ impl Parser {
 
                 self.expect(TokenType::EOL)?;
 
-                let then_branch = self.parse_block(Some(&[TokenType::Else, TokenType::EndIf]))?;
+                let then_branch = self.parse_block(Some(&[TokenType::Else, TokenType::End]))?;
 
                 let else_branch = if self.peek().token_type == TokenType::Else {
                     self.eat()?; // Eat the else
                     self.expect(TokenType::EOL)?; // Eat the EOL
 
-                    let else_branch = self.parse_block(Some(&[TokenType::EndIf]))?;
+                    let else_branch = self.parse_block(Some(&[TokenType::End]))?;
 
                     Some(else_branch)
                 } else {
                     None
                 };
 
-                self.expect(TokenType::EndIf)?;
+                self.expect(TokenType::End)?;
                 self.expect(TokenType::EOL)?;
 
                 let line = condition.line;
@@ -408,6 +497,22 @@ impl Parser {
             token_type => {
                 Err(UnexpectedToken::new(token_type, None, token.line, token.column).into())
             }
+        }
+    }
+
+    fn parse_identifier(&mut self) -> Result<ast::Expression, Error> {
+        let identifier = self.parse_primary()?;
+
+        if let ExpressionType::Identifier(_) = identifier.expression_type {
+            Ok(identifier)
+        } else {
+            Err(UnexpectedExpression::new(
+                identifier.expression_type,
+                Some(ExpressionType::Identifier(String::new())),
+                identifier.line,
+                identifier.column,
+            )
+            .into())
         }
     }
 }

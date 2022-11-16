@@ -10,7 +10,8 @@ pub enum TokenType {
     // Keywords
     If,
     Else,
-    EndIf,
+    End,
+    Function,
     Return,
 
     // Arithmatic Operators

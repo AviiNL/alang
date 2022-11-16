@@ -38,7 +38,6 @@ impl ParserExt for Parser {
 
     fn expect(&mut self, expected: TokenType) -> Result<Token, Error> {
         let token = self.eat()?;
-        println!("{:?}", token);
 
         if token.token_type == expected || expected == TokenType::EOF {
             Ok(token)
