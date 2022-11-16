@@ -455,7 +455,11 @@ impl Parser {
             TokenType::If => {
                 let condition = self.parse_expression()?;
 
-                self.expect(TokenType::EOL)?;
+                self.expect(TokenType::Then)?;
+
+                while self.peek().token_type == TokenType::EOL {
+                    self.eat()?; // eat any lingering EOLS
+                }
 
                 let then_branch = self.parse_block(Some(&[TokenType::Else, TokenType::End]))?;
 
@@ -483,7 +487,9 @@ impl Parser {
                 let value = self.parse_expression()?;
 
                 if self.tokens.len() > 1 {
-                    self.expect(TokenType::EOL)?;
+                    while self.peek().token_type == TokenType::EOL {
+                        self.eat()?; // eat any lingering EOLS
+                    }
                 }
 
                 let line = value.line;

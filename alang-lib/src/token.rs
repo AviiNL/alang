@@ -9,6 +9,7 @@ pub enum TokenType {
 
     // Keywords
     If,
+    Then,
     Else,
     End,
     Function,

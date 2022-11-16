@@ -1,7 +1,5 @@
 test = 12
 
-result = if test == 1
-    return "no"
-end
+result = if test == 1 then return "no" else if test == 2 then return "yes" else return "maybe?" end
 
 return result
