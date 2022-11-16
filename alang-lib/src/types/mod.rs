@@ -48,6 +48,26 @@ impl BinaryOperation for RuntimeValue {
                             value: other == "function",
                         }))
                     }
+                    RuntimeValue::Number(_) => {
+                        return Ok(RuntimeValue::Boolean(boolean::BooleanVal {
+                            value: other == "number",
+                        }))
+                    }
+                    RuntimeValue::String(_) => {
+                        return Ok(RuntimeValue::Boolean(boolean::BooleanVal {
+                            value: other == "string",
+                        }))
+                    }
+                    RuntimeValue::Boolean(_) => {
+                        return Ok(RuntimeValue::Boolean(boolean::BooleanVal {
+                            value: other == "boolean",
+                        }))
+                    }
+                    RuntimeValue::Character(_) => {
+                        return Ok(RuntimeValue::Boolean(boolean::BooleanVal {
+                            value: other == "character",
+                        }))
+                    }
                     _ => return Ok(RuntimeValue::Boolean(boolean::BooleanVal { value: false })),
                 };
             }
