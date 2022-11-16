@@ -517,7 +517,6 @@ impl Parser {
         }
 
         if self.peek().token_type == TokenType::If {
-            println!("We got another if.");
             return Ok(vec![self.parse()?]);
         }
 

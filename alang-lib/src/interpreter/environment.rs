@@ -39,7 +39,8 @@ impl Environment {
 
     pub fn set(&mut self, symbol: &str, value: RuntimeValue, is_const: bool) -> RuntimeValue {
         if self.variables.contains_key(symbol) {
-            panic!("Variable {} already defined", symbol);
+            self.assign(symbol, value.clone());
+            return value;
         }
 
         self.variables.insert(symbol.to_string(), value.clone());
