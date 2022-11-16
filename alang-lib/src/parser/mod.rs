@@ -460,18 +460,11 @@ impl Parser {
                 let then_branch = self.parse_block(Some(&[TokenType::Else, TokenType::End]))?;
 
                 let else_branch = if self.peek().token_type == TokenType::Else {
-                    self.eat()?; // Eat the else
-                    self.expect(TokenType::EOL)?; // Eat the EOL
-
-                    let else_branch = self.parse_block(Some(&[TokenType::End]))?;
-
-                    Some(else_branch)
+                    Some(self.parse_else()?)
                 } else {
+                    self.expect(TokenType::End)?;
                     None
                 };
-
-                self.expect(TokenType::End)?;
-                self.expect(TokenType::EOL)?;
 
                 let line = condition.line;
                 let column = condition.column;
@@ -508,6 +501,25 @@ impl Parser {
                 Err(UnexpectedToken::new(token_type, None, token.line, token.column).into())
             }
         }
+    }
+
+    fn parse_else(&mut self) -> Result<Vec<ast::Expression>, Error> {
+        self.eat()?; // eat the else
+
+        while self.peek().token_type == TokenType::EOL {
+            self.eat()?; // eat any lingering EOLS
+        }
+
+        if self.peek().token_type == TokenType::If {
+            println!("We got another if.");
+            return Ok(vec![self.parse()?]);
+        }
+
+        let else_branch = self.parse_block(Some(&[TokenType::End, TokenType::Else]))?;
+
+        self.expect(TokenType::End)?;
+
+        Ok(else_branch)
     }
 
     fn parse_identifier(&mut self) -> Result<ast::Expression, Error> {
