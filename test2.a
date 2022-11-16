@@ -16,4 +16,10 @@ else
     return result1
 end
 
-return result2
+value = if "true" is string
+    return "yes"
+else
+    return "no"
+end
+
+return value

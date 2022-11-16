@@ -14,6 +14,10 @@ static KEYWORDS: &[(&str, TokenType)] = &[
     ("end", TokenType::End),
     ("return", TokenType::Return),
     ("is", TokenType::Is),
+    ("boolean", TokenType::Boolean(false)),
+    ("string", TokenType::String(String::new())),
+    ("number", TokenType::Number(0.0)),
+    ("character", TokenType::Character(' ')),
 ];
 
 pub fn tokenize(input: &str) -> Result<VecDeque<Token>, Error> {

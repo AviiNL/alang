@@ -39,6 +39,10 @@ impl BinaryOperation for RuntimeValue {
             Operator::Relational(Relational::Is) => {
                 let other = match other {
                     RuntimeValue::Type(other) => other,
+                    RuntimeValue::Number(_) => "number",
+                    RuntimeValue::String(_) => "string",
+                    RuntimeValue::Boolean(_) => "boolean",
+                    RuntimeValue::Character(_) => "character",
                     _ => return Err(BinaryOperationError::InvalidOperationType),
                 };
 
