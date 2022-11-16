@@ -1,4 +1,3 @@
-use crate::types::Operator;
 use std::fmt::Display;
 
 #[derive(Debug)]
